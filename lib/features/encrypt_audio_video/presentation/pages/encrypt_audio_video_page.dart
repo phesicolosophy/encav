@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/utils/encryption_data.dart';
 import '../../domain/entities/encrypted_audio_video.dart';
-import '../widgests/add_key_iv.dart';
-import '../widgests/display_encypted.dart';
-
+import '../widgets/add_key_iv.dart';
+import '../widgets/display_encrypted.dart';
+// refactor the code clean architecture
 
 class EncryptAudioVideoPage extends StatefulWidget {
   const EncryptAudioVideoPage({super.key});
@@ -22,7 +22,7 @@ class _EncryptAudioVideoPageState extends State<EncryptAudioVideoPage> {
 
   bool searchSubDirectory = false;
   String searchFolder = '';
-  List<String> directoryInSearchFloder = [];
+  List<String> directoryInSearchFolder = [];
   String currentDirectory = Directory.current.path;
 
   bool _isEncryption = false;
@@ -31,7 +31,7 @@ class _EncryptAudioVideoPageState extends State<EncryptAudioVideoPage> {
   void initState() {
     super.initState();
     getCurrentDirectory(searchFolder);
-    getDirectoriesInSearchFloder();
+    getDirectoriesInSearchFolder();
     getAllAudioVideoFiles();
   }
 
@@ -43,14 +43,14 @@ class _EncryptAudioVideoPageState extends State<EncryptAudioVideoPage> {
     currentDirectory = Directory(currentDirectory).parent.path;
   }
 
-  void getDirectoriesInSearchFloder() {
-    directoryInSearchFloder.clear();
+  void getDirectoriesInSearchFolder() {
+    directoryInSearchFolder.clear();
     // final nextDirectory = p.join(currentDirectory, directoryPath);
     final allFiles = Directory(currentDirectory).listSync();
     for (var file in allFiles) {
       if (file.statSync().type == FileSystemEntityType.directory) {
         final String baseName = file.path.split('/').last;
-        directoryInSearchFloder.add(baseName);
+        directoryInSearchFolder.add(baseName);
       }
     }
   }
@@ -107,7 +107,7 @@ class _EncryptAudioVideoPageState extends State<EncryptAudioVideoPage> {
                 //_% Add new Key and IV
                 const AddKeyIV(),
                 const Spacer(flex: 2),
-                // Todo FixMe: temporarely change from open directory to search button
+                // Todo FixMe: temporally change from open directory to search button
                 //_% Search button
                 IconButton.filledTonal(
                   tooltip: 'search',
@@ -127,7 +127,7 @@ class _EncryptAudioVideoPageState extends State<EncryptAudioVideoPage> {
                 IconButton.filled(
                     onPressed: () {
                       getPreviousDirectory();
-                      getDirectoriesInSearchFloder();
+                      getDirectoriesInSearchFolder();
                       setState(() {});
                     },
                     icon: const Icon(Icons.replay)),
@@ -136,15 +136,15 @@ class _EncryptAudioVideoPageState extends State<EncryptAudioVideoPage> {
                   dropdownColor: Colors.green,
                   hint: const Text('Search in'),
                   items: List<DropdownMenuItem<String>>.generate(
-                    directoryInSearchFloder.length,
+                    directoryInSearchFolder.length,
                     (index) => DropdownMenuItem<String>(
-                      value: directoryInSearchFloder[index],
-                      child: Text(directoryInSearchFloder[index]),
+                      value: directoryInSearchFolder[index],
+                      child: Text(directoryInSearchFolder[index]),
                     ),
                   ),
                   onChanged: (onSelected) {
                     getCurrentDirectory(onSelected ?? '');
-                    getDirectoriesInSearchFloder();
+                    getDirectoriesInSearchFolder();
                     setState(() {});
                   },
                 ),
@@ -156,7 +156,7 @@ class _EncryptAudioVideoPageState extends State<EncryptAudioVideoPage> {
             Expanded(
               child: DisplayEncrypted(audio: audioFilesName, video: videoFilesName),
             ),
-            //_% Search Subfolders
+            //_% Search Sub-folders
             Row(
               children: [
                 Checkbox(
@@ -164,34 +164,37 @@ class _EncryptAudioVideoPageState extends State<EncryptAudioVideoPage> {
                     onChanged: (onToggle) => setState(() {
                           searchSubDirectory = onToggle ?? false;
                         })),
-                const Text('Search subfolders')
+                const Text('Search sub-folders')
               ],
             ),
-            //_% Encyption button
+            //_% Encryption button
             ElevatedButton(
               onPressed: () {
                 setState(() => _isEncryption = true);
                 Future.microtask(() async {
                   for (var aud in audioFilesName) {
                     // Todo Improve: in getAllAudioVideoFiles save the hole path not just the baseName
-                    // Todo Improve: because when to encrypt you encript in smae folder.
-                    if (aud.isCheck)
+                    // Todo Improve: because when to encrypt you encrypt in same folder.
+                    if (aud.isCheck) {
                       await EncryptData.encryptAV(p.join(currentDirectory, aud.name));
+                    }
                   }
                   for (var vid in videoFilesName) {
-                    if (vid.isCheck)
+                    if (vid.isCheck) {
                       await EncryptData.encryptAV(p.join(currentDirectory, vid.name));
+                    }
                   }
                 }).then((_) => setState(() => _isEncryption = false));
               },
-              child: _isEncryption
-                  ? const CircularProgressIndicator()
-                  : const Text('Encrypt'),
+              child: _isEncryption ? const CircularProgressIndicator() : const Text('Encrypt'),
             ),
-            ElevatedButton(onPressed: () {
-              print(currentDirectory+'/1890350767');
-              EncryptData.decryptAV(currentDirectory+'/1890350767', '.mp3');
-            }, child: Text('decrypt')),
+            //_% Decryption button
+            ElevatedButton(
+                onPressed: () {
+                  print(currentDirectory + '/1890350767');
+                  EncryptData.decryptAV(currentDirectory + '/1890350767', '.mp3');
+                },
+                child: const Text('decrypt')),
             const SizedBox(height: 8.0),
           ],
         ));

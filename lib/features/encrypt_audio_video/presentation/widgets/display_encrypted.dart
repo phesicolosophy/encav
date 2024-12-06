@@ -1,4 +1,4 @@
-import 'package:encav/features/encypt_audio_video/domain/entities/encrypted_audio_video.dart';
+import 'package:encav/features/encrypt_audio_video/domain/entities/encrypted_audio_video.dart';
 import 'package:flutter/material.dart';
 
 /// Display all not encrypted audio and video.
@@ -17,19 +17,19 @@ class DisplayEncrypted extends StatefulWidget {
 }
 
 class _DisplayEncryptedState extends State<DisplayEncrypted> {
-  int numOfAudioEncryptedFileCheked = 0;
-  int numOfVideoEncryptedFileCheked = 0;
+  int numOfAudioEncryptedFileChecked = 0;
+  int numOfVideoEncryptedFileChecked = 0;
 
   bool checkAllAudio = false;
   bool checkAllVideo = false;
 
-  void countAudioEncryptCheked() {
-    numOfAudioEncryptedFileCheked =
+  void countAudioEncryptChecked() {
+    numOfAudioEncryptedFileChecked =
         widget.audio.where((toElement) => toElement.isCheck == true).length;
   }
 
-  void countVideoEncryptCheked() {
-    numOfVideoEncryptedFileCheked =
+  void countVideoEncryptChecked() {
+    numOfVideoEncryptedFileChecked =
         widget.video.where((toElement) => toElement.isCheck == true).length;
   }
 
@@ -54,7 +54,7 @@ class _DisplayEncryptedState extends State<DisplayEncrypted> {
                     for (var aud in widget.audio) {
                       aud.isCheck = onCheckAllAudio ?? false;
                     }
-                    countAudioEncryptCheked();
+                    countAudioEncryptChecked();
                     setState(() {});
                   },
                 ),
@@ -63,7 +63,7 @@ class _DisplayEncryptedState extends State<DisplayEncrypted> {
                 //_% Number of encrypting files / Total files
                 Row(
                   children: [
-                    Text('$numOfAudioEncryptedFileCheked'),
+                    Text('$numOfAudioEncryptedFileChecked'),
                     const Text('/'),
                     Text('${widget.audio.length}'),
                   ],
@@ -92,7 +92,7 @@ class _DisplayEncryptedState extends State<DisplayEncrypted> {
                       child: IconButton.filled(
                         onPressed: () {
                           widget.audio[index].isCheck = !widget.audio[index].isCheck;
-                          countAudioEncryptCheked();
+                          countAudioEncryptChecked();
                           setState(() {});
                         },
                         icon: Row(
@@ -118,7 +118,7 @@ class _DisplayEncryptedState extends State<DisplayEncrypted> {
                     for (var vid in widget.video) {
                       vid.isCheck = onCheckAllVideo ?? false;
                     }
-                    countVideoEncryptCheked();
+                    countVideoEncryptChecked();
                     setState(() {});
                   },
                 ),
@@ -127,7 +127,7 @@ class _DisplayEncryptedState extends State<DisplayEncrypted> {
                 //_% Number of encrypting files / Total files
                 Row(
                   children: [
-                    Text('$numOfVideoEncryptedFileCheked'),
+                    Text('$numOfVideoEncryptedFileChecked'),
                     const Text('/'),
                     Text('${widget.video.length}'),
                   ],
@@ -156,7 +156,7 @@ class _DisplayEncryptedState extends State<DisplayEncrypted> {
                       child: IconButton.filled(
                         onPressed: () {
                           widget.video[index].isCheck = !widget.video[index].isCheck;
-                          countVideoEncryptCheked();
+                          countVideoEncryptChecked();
                           setState(() {});
                         },
                         icon: Row(

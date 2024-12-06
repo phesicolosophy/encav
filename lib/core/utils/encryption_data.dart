@@ -8,7 +8,7 @@ import 'package:encrypt/encrypt.dart';
 import 'package:path/path.dart' as p show join, hash, basename;
 
 class EncryptData {
-  /// Ecrypt audio or video files on seperate thread befor playing them.
+  /// Encrypt audio or video files on separate thread before playing them.
   ///
   /// {@tool snippet}
   ///
@@ -38,11 +38,11 @@ class EncryptData {
         encryptedFile.writeAsBytesSync(enc.bytes, mode: FileMode.writeOnly);
       });
     } catch (_) {
-      dev.log('Ecryption file error using Isolate on ecryptAV', name: 'EncryptData');
+      dev.log('Encryption file error using Isolate on encryptAV', name: 'EncryptData');
     }
   }
 
-  /// Decrypt audio or video files on seperate thread befor playing them.
+  /// Decrypt audio or video files on separate thread before playing them.
   ///
   /// {@tool snippet}
   /// [filePath] is the relative path of the audio or video to the current directory.
