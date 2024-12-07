@@ -1,4 +1,5 @@
 import 'dart:io' show Directory, FileSystemEntityType;
+import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:flutter/material.dart';
@@ -26,6 +27,8 @@ class _EncryptAudioVideoPageState extends State<EncryptAudioVideoPage> {
   String currentDirectory = Directory.current.path;
 
   bool _isEncryption = false;
+
+  Map<String, String> logEncryptedOldNewNames = {};
 
   @override
   void initState() {
@@ -86,6 +89,37 @@ class _EncryptAudioVideoPageState extends State<EncryptAudioVideoPage> {
     setState(() {});
   }
 
+  void _showLogEncryptedOldNewNames() {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: ListView(
+          shrinkWrap: true,
+          children: List.generate(logEncryptedOldNewNames.length, (index) {
+            final String newName = logEncryptedOldNewNames.values.toList()[index];
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '${logEncryptedOldNewNames.keys.toList()[index]} ->',
+                ),
+                TextButton(
+                  onPressed: () async {
+                    Clipboard.setData(ClipboardData(text: newName));
+                    ScaffoldMessenger.of(context).clearSnackBars();
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(const SnackBar(content: Text('Data copied to clipboard')));
+                  },
+                  child: Text(newName),
+                )
+              ],
+            );
+          }),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,7 +148,7 @@ class _EncryptAudioVideoPageState extends State<EncryptAudioVideoPage> {
                   onPressed: () {
                     getAllAudioVideoFiles();
                   },
-                  icon: const Icon(Icons.folder),
+                  icon: const Icon(Icons.search),
                 ),
                 const Spacer(flex: 2),
               ],
@@ -156,41 +190,52 @@ class _EncryptAudioVideoPageState extends State<EncryptAudioVideoPage> {
             Expanded(
               child: DisplayEncrypted(audio: audioFilesName, video: videoFilesName),
             ),
-            //_% Search Sub-folders
             Row(
               children: [
+                //_% Search Sub-folders
                 Checkbox(
                     value: searchSubDirectory,
                     onChanged: (onToggle) => setState(() {
                           searchSubDirectory = onToggle ?? false;
                         })),
-                const Text('Search sub-folders')
+                const Text('Search sub-folders'),
+                const Spacer(),
+                //_% Log encrypted old and new names
+                IconButton.filled(
+                    onPressed: _showLogEncryptedOldNewNames,
+                    icon: const Icon(Icons.my_library_books_outlined))
               ],
             ),
             //_% Encryption button
             ElevatedButton(
               onPressed: () {
+                logEncryptedOldNewNames.clear();
                 setState(() => _isEncryption = true);
                 Future.microtask(() async {
                   for (var aud in audioFilesName) {
                     // Todo Improve: in getAllAudioVideoFiles save the hole path not just the baseName
                     // Todo Improve: because when to encrypt you encrypt in same folder.
                     if (aud.isCheck) {
-                      await EncryptData.encryptAV(p.join(currentDirectory, aud.name));
+                      logEncryptedOldNewNames
+                          .addAll(await EncryptData.encryptAV(p.join(currentDirectory, aud.name)));
                     }
                   }
                   for (var vid in videoFilesName) {
                     if (vid.isCheck) {
-                      await EncryptData.encryptAV(p.join(currentDirectory, vid.name));
+                      logEncryptedOldNewNames
+                          .addAll(await EncryptData.encryptAV(p.join(currentDirectory, vid.name)));
                     }
                   }
                 }).then((_) => setState(() => _isEncryption = false));
               },
-              child: _isEncryption ? const CircularProgressIndicator() : const Text('Encrypt'),
+              child: _isEncryption
+                  ? const SizedBox.square(dimension: 16.0, child: CircularProgressIndicator())
+                  : const Text('Encrypt'),
             ),
             //_% Decryption button
             ElevatedButton(
                 onPressed: () {
+                  // Todo implement
                   print(currentDirectory + '/1890350767');
                   EncryptData.decryptAV(currentDirectory + '/1890350767', '.mp3');
                 },

@@ -83,8 +83,10 @@ class _DisplayEncryptedState extends State<DisplayEncrypted> {
               ? const Center(child: Text('none found'))
               : Flexible(
                   child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 100.0,
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      // if widget.audio.length = 1 the IconButton.filled is to big.
+                      // Todo FixMe find another way for the widget to be user friendly.
+                      maxCrossAxisExtent: 50 + 500 / (widget.audio.length == 1 ? 2 : widget.audio.length), // 100.0,
                       childAspectRatio: 1.6,
                     ),
                     itemCount: widget.audio.length,
@@ -147,8 +149,8 @@ class _DisplayEncryptedState extends State<DisplayEncrypted> {
               ? const Center(child: Text('none found'))
               : Flexible(
                   child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 100.0,
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 50 + 500 / (widget.video.length == 1 ? 2 : widget.video.length), //100.0,
                       childAspectRatio: 1.6,
                     ),
                     itemCount: widget.video.length,

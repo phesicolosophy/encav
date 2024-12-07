@@ -19,14 +19,16 @@ class EncryptData {
   /// await EncryptData.encryptAV('audio/song.mp3');
   /// ```
   /// {@end-tool}
-  static Future<void> encryptAV(String filePath) async {
+  /// 
+  /// return a pair of the old name before encryption and the new name after encryption.
+  static Future<Map<String,String>> encryptAV(String filePath) async {
     final File file = File(filePath);
     final List<String> splitFilePath = filePath.split('/');
     final String hashFileName = p.hash(filePath).toString();
     final String encryptedPath =
         p.join(splitFilePath.sublist(0, splitFilePath.length - 1).join('/'), hashFileName);
     final File encryptedFile = File(encryptedPath);
-    print('${splitFilePath[splitFilePath.length - 1]} -> $hashFileName');
+    // print('${splitFilePath[splitFilePath.length - 1]} -> $hashFileName');
 
     final Key key = Key.fromUtf8(EncConstant.key);
     final IV iv = IV.fromUtf8(EncConstant.iv);
@@ -37,8 +39,10 @@ class EncryptData {
         final Encrypted enc = encrypter.encryptBytes(file.readAsBytesSync(), iv: iv);
         encryptedFile.writeAsBytesSync(enc.bytes, mode: FileMode.writeOnly);
       });
+      return {splitFilePath[splitFilePath.length - 1] : hashFileName};
     } catch (_) {
       dev.log('Encryption file error using Isolate on encryptAV', name: 'EncryptData');
+      return {};
     }
   }
 
